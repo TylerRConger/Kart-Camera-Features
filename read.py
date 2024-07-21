@@ -31,10 +31,13 @@ def main():
         classes = f.read().splitlines()
 
     # Webcam usage
-    #cap = cv.VideoCapture(0)
+    # cap = cv.VideoCapture(0)
 
     # Video Usage
     cap = cv.VideoCapture('policeDrivingTest.mp4')
+
+    # Saving the video locally, can also be done through ROS nodes but useful when running this code by itself
+    # out = cv.VideoWriter('output.avi', -1, 20.0, (416, 416))
 
     count = 0
 
@@ -58,7 +61,9 @@ def main():
             count += 15
             cap.set(cv.CAP_PROP_POS_FRAMES, count)
 
-            #image = cv.imread('coneTester.jpg')
+
+            # Useful for a single tester image without massively modifying the code
+            image = cv.imread('images/val/cone (195).jpg')
 
             # get the shape
             height, width, _ = image.shape
@@ -128,9 +133,8 @@ def main():
                 coneWidth = w
                 coneHeight = h
 
-
+                # If the focal length isn't set yet, set it up, should only be done once
                 if CAMERA_FOCAL_LENGTH == None:
-                    print("Here")
                     getFocalLength(CONE_EST_DIST, CONE_ACTUAL_HEIGHT, coneHeight)
 
                 distance = getConeHeight(coneHeight)
@@ -141,14 +145,19 @@ def main():
                     print("Watch out cone near!")
     
                 # Display distance and confidence
-                cv.putText(image, label + " " + conf + ":: Distance " + str(round(distance, 2)), (x, y+20), font, 2, (255, 255, 255), 1)
-                    
+                cv.putText(image, label + " " + conf + ":: Distance " + str(round(distance, 2)), (x, y+20), font, 2, (255, 255, 255), 1)                   
 
                     
             
             # Change text based on camera angle view
             cv.imshow('Kart View', image)
+
+            # Write the frame to video if wanted
+            # out.write(image)
             
+            # Write the single image
+            cv.imwrite('testResult2.jpg', image)
+
             # Wait for escape key to be pressed
             key = cv.waitKey(1)
             if key == 27:
@@ -157,5 +166,7 @@ def main():
 
     cap.release()
     cv.destroyAllWindows()
+
+    #out.release()
 
 main()
